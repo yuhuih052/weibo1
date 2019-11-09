@@ -7,39 +7,49 @@ use Auth;
 
 class SessionsController extends Controller
 {
-    public function create(){
+    public function __construct()
+    {
+        $this->middleware('guest', ['only' => ['create']]);
+    }
+
+    public function create()
+    {
 
         return view('sessions.create');
 
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-        $credentials = $this -> validate($request,[
+        $credentials = $this->validate($request, [
             'email' => 'required|email|max:255',
             'password' => 'required'
         ]);
 
         //attempt方法的使用 ：attempt(['email' => $email, 'password' => $password])
         //密码和邮箱验证
-        if(Auth::attempt($credentials,$request->has('remeber'))){
+        if (Auth::attempt($credentials, $request->has('remeber'))) {
 
-            session()->flash('success','欢迎回来');
-            return redirect()->route('users.show',[Auth::user()]);
+            session()->flash('success', '欢迎回来');
 
-        }else{
+            $fallback = route('users.show', [Auth::user()]);
+            return redirect()->intended($fallback);
 
-            session()->flash('danger','很抱歉，您的邮箱和密码不匹配');
+        } else {
+
+            session()->flash('danger', '很抱歉，您的邮箱和密码不匹配');
             return redirect()->back()->withInput();
 
         }
     }
 
-    public function destroy(){
+    public function destroy()
+    {
 
         Auth::logout();
 
-        session()->flash('success','您已成功退出，拜拜！');
+        session()->flash('success', '您已成功退出，拜拜！');
 
         return redirect('login');
 
