@@ -22,19 +22,17 @@ class SessionsController extends Controller
 
         //attempt方法的使用 ：attempt(['email' => $email, 'password' => $password])
         //密码和邮箱验证
-        if(Auth::attempt($credentials)){
-
+        if(Auth::attempt($credentials,$request->has('remeber'))){
 
             session()->flash('success','欢迎回来');
             return redirect()->route('users.show',[Auth::user()]);
+
         }else{
 
             session()->flash('danger','很抱歉，您的邮箱和密码不匹配');
             return redirect()->back()->withInput();
 
         }
-
-        return;
     }
 
     public function destroy(){
