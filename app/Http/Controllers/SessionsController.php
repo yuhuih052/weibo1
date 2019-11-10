@@ -31,11 +31,20 @@ class SessionsController extends Controller
         //密码和邮箱验证
         if (Auth::attempt($credentials, $request->has('remeber'))) {
 
-            session()->flash('success', '欢迎回来');
+            if (Auth::user()->activated) {
 
-            $fallback = route('users.show', [Auth::user()]);
-            return redirect()->intended($fallback);
+                session()->flash('success', '欢迎回来');
 
+                $fallback = route('users.show', [Auth::user()]);
+
+                return redirect()->intended($fallback);
+
+            } else {
+
+                Auth::logout();
+                session()->flash('warning', '你的账号未激活，请检查邮箱中的注册邮件进行激活。');
+                return redirect('/');
+            }
         } else {
 
             session()->flash('danger', '很抱歉，您的邮箱和密码不匹配');
