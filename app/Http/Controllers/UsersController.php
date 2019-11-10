@@ -14,7 +14,7 @@ class UsersController extends Controller
     {
         $this->middleware('auth', [
 
-            'except' => ['show', 'create', 'store','index','confirmEmail']
+            'except' => ['show', 'create', 'store', 'index', 'confirmEmail']
         ]);
 
         $this->middleware('guest', [
@@ -41,7 +41,11 @@ class UsersController extends Controller
     public function show(User $user)
     {
 
-        return view('users.show', compact('user'));
+        $statuses = $user->statuses()
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(30);
+
+        return view('users.show', compact('user','statuses'));
 
     }
 
@@ -103,11 +107,12 @@ class UsersController extends Controller
 
     }
 
-    public function destroy(User $user){
+    public function destroy(User $user)
+    {
 
         $this->authorize('destroy', $user);
         $user->delete();
-        session()->flash('success','您已成功删除用户');
+        session()->flash('success', '您已成功删除用户');
 
         return back();
 
@@ -119,7 +124,7 @@ class UsersController extends Controller
         $data = compact('user');
         $to = $user->email;
         $subject = "感谢注册 Weibo 应用！请确认你的邮箱。";
-        Mail::send($view, $data, function ($message) use ( $to, $subject){
+        Mail::send($view, $data, function ($message) use ($to, $subject) {
 
             $message->to($to)->subject($subject);
 
