@@ -89,7 +89,7 @@ class User extends Authenticatable
 
     public function unfollow($user_ids){
 
-        if(!is_array($user_ids)){
+        if( ! is_array($user_ids)){
 
             $user_ids = compact('user_ids');
         }
@@ -97,8 +97,8 @@ class User extends Authenticatable
         $this->followings()->detach($user_ids);
     }
 
-    public function isfollowings($user_id){
-
-        return $this->followings()->contains($user_id);
+    public function isFollowing($user_id)
+    {
+        return $this->followings->contains($user_id);
     }
 }
